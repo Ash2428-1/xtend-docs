@@ -73,6 +73,32 @@ export const OrganisationInviteEmailTemplate = ({
                   <Trans>Decline</Trans>
                 </Button>
               </Section>
+
+              {/* xtend-docs: new users must come back and click Accept a second time after signing up. */}
+              <Section className="mx-auto mb-4 max-w-md rounded-lg bg-muted px-4 py-3 text-left">
+                <Text className="my-1 font-medium text-base text-foreground">
+                  <Trans>What to do</Trans>
+                </Text>
+                <Text className="my-1 text-sm">
+                  <Trans>
+                    1. Click <strong>Accept</strong> above.
+                  </Trans>
+                </Text>
+                <Text className="my-1 text-sm">
+                  <Trans>
+                    2. New here? Click <strong>Create account</strong> and sign up with the email address this
+                    invitation was sent to. Then open the confirmation email and confirm your address.
+                  </Trans>
+                </Text>
+                <Text className="my-1 text-sm">
+                  <Trans>
+                    3. Come back to this email and click <strong>Accept</strong> again to join {organisationName}.
+                  </Trans>
+                </Text>
+                <Text className="my-1 text-sm">
+                  <Trans>Already have an account? Sign in first, then click Accept. That's it.</Trans>
+                </Text>
+              </Section>
             </Section>
           </Container>
 
