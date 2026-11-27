@@ -6,7 +6,7 @@
   "outputDirectory": "apps/remix/build/client",
   "regions": ["dub1"],
   "functions": {
-    "api/index.js": {
+    "api/index.mjs": {
       "maxDuration": 300,
       "memory": 2048,
       "includeFiles": "{apps/remix/build/server/**,packages/lib/translations/**,packages/assets/**}"
