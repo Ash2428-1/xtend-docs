@@ -14,6 +14,7 @@ import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router';
 
+const TEN_MINUTES_MS = 10 * 60 * 1000;
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 export default function AdminUnsealedDocumentsPage() {
@@ -37,6 +38,7 @@ export default function AdminUnsealedDocumentsPage() {
     },
     {
       placeholderData: (previousData) => previousData,
+      refetchInterval: 60_000,
     },
   );
 
@@ -110,7 +112,13 @@ export default function AdminUnsealedDocumentsPage() {
           const isOld = stuckMs > SIX_HOURS_MS;
           const label = signedAt.toRelative() ?? '';
 
-          return <Badge variant={isOld ? 'destructive' : 'warning'}>{label}</Badge>;
+          const isDelayed = stuckMs >= TEN_MINUTES_MS;
+
+          return (
+            <Badge variant={isOld ? 'destructive' : isDelayed ? 'warning' : 'secondary'}>
+              {isDelayed ? <Trans>Delayed � {label}</Trans> : label}
+            </Badge>
+          );
         },
       },
       {

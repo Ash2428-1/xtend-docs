@@ -17,7 +17,7 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 import { msg } from '@lingui/core/macro';
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, RecipientRole } from '@prisma/client';
 import { ChevronLeft, Users2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
@@ -31,6 +31,7 @@ import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/d
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
+  isFinalizingDocument,
 } from '~/components/general/document/document-status';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
@@ -102,6 +103,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
     );
   }
 
+  const isFinalizing = isFinalizingDocument(envelope.status, envelope.recipients);
   const documentRootPath = formatDocumentsPath(team.url);
 
   const isMultiEnvelopeItem = envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
@@ -124,7 +126,12 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
           </h1>
 
           <div className="mt-2.5 flex items-center gap-x-6">
-            <DocumentStatusComponent inheritColor status={envelope.status} className="text-muted-foreground" />
+            <DocumentStatusComponent
+              inheritColor
+              status={envelope.status}
+              recipients={envelope.recipients}
+              className="text-muted-foreground"
+            />
 
             {envelope.recipients.length > 0 && (
               <div className="flex items-center text-muted-foreground">
@@ -215,7 +222,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
             <section className="flex flex-col rounded-xl border border-border bg-widget pt-6 pb-4">
               <div className="flex flex-row items-center justify-between px-4">
                 <h3 className="font-semibold text-2xl text-foreground">
-                  {t(FRIENDLY_STATUS_MAP[envelope.status].labelExtended)}
+                  {isFinalizing ? <Trans>Finalizing PDF</Trans> : t(FRIENDLY_STATUS_MAP[envelope.status].labelExtended)}
                 </h3>
 
                 <DocumentPageViewDropdown envelope={envelope} />
@@ -230,8 +237,12 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
                     <Trans>This document is currently a draft and has not been sent</Trans>
                   ))
                   .with(DocumentStatus.PENDING, () => {
+                    if (isFinalizing) {
+                      return <Trans>All required signatures have been received. The final PDF is being prepared.</Trans>;
+                    }
+
                     const pendingRecipients = envelope.recipients.filter(
-                      (recipient) => recipient.signingStatus === 'NOT_SIGNED',
+                      (recipient) => recipient.role !== RecipientRole.CC && recipient.signingStatus === 'NOT_SIGNED',
                     );
 
                     return (

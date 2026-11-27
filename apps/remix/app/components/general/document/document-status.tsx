@@ -4,6 +4,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { RecipientRole, SigningStatus } from '@prisma/client';
 import { CheckCircle2, Clock, File, TimerOff, XCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 import type { HTMLAttributes } from 'react';
@@ -65,15 +66,38 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus>
   },
 };
 
+type RecipientProgress = { role: RecipientRole; signingStatus: SigningStatus };
+
+export const isFinalizingDocument = (
+  status: ExtendedDocumentStatus,
+  recipients: readonly RecipientProgress[],
+) =>
+  status === 'PENDING' &&
+  recipients.some(({ role, signingStatus }) => role !== RecipientRole.CC && signingStatus === SigningStatus.SIGNED) &&
+  recipients.every(({ role, signingStatus }) => role === RecipientRole.CC || signingStatus === SigningStatus.SIGNED);
+
 export type DocumentStatusProps = HTMLAttributes<HTMLSpanElement> & {
   status: ExtendedDocumentStatus;
   inheritColor?: boolean;
+  recipients?: readonly RecipientProgress[];
 };
 
-export const DocumentStatus = ({ className, status, inheritColor, ...props }: DocumentStatusProps) => {
+export const DocumentStatus = ({
+  className,
+  status,
+  inheritColor,
+  recipients,
+  ...props
+}: DocumentStatusProps) => {
   const { _ } = useLingui();
 
   const { label, icon: Icon, color } = FRIENDLY_STATUS_MAP[status];
+  const displayLabel =
+    status === 'PENDING' && recipients
+      ? isFinalizingDocument(status, recipients)
+        ? msg`Finalizing PDF`
+        : msg`Awaiting signatures`
+      : label;
 
   return (
     <span className={cn('flex items-center', className)} {...props}>
@@ -84,7 +108,7 @@ export const DocumentStatus = ({ className, status, inheritColor, ...props }: Do
           })}
         />
       )}
-      {_(label)}
+      {_(displayLabel)}
     </span>
   );
 };
