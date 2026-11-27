@@ -9,7 +9,7 @@
     "api/index.mjs": {
       "maxDuration": 300,
       "memory": 2048,
-      "includeFiles": "{apps/remix/build/server/**,packages/lib/translations/**,packages/assets/**}"
+      "includeFiles": "{apps/remix/build/server/**,packages/lib/translations/**,packages/assets/**,public/fonts/**}"
     }
   },
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
