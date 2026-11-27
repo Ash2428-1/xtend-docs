@@ -5,6 +5,7 @@ import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
+import { Badge } from '@documenso/ui/primitives/badge';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -113,6 +114,19 @@ export const OrganisationMemberInvitesTable = () => {
         header: _(msg`Role`),
         accessorKey: 'role',
         cell: ({ row }) => _(ORGANISATION_MEMBER_ROLE_MAP[row.original.organisationRole]),
+      },
+      {
+        header: _(msg`Status`),
+        cell: ({ row }) =>
+          row.original.hasAccount ? (
+            <Badge variant="warning">
+              <Trans>Signed up, not accepted</Trans>
+            </Badge>
+          ) : (
+            <Badge variant="neutral">
+              <Trans>Invited</Trans>
+            </Badge>
+          ),
       },
       {
         header: _(msg`Invited At`),

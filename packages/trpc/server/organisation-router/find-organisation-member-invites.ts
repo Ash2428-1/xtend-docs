@@ -100,11 +100,30 @@ export const findOrganisationMemberInvites = async ({
     }),
   ]);
 
+  // xtend-docs: flag invites whose email already belongs to a user account.
+  const existingUsers = data.length
+    ? await prisma.user.findMany({
+        where: {
+          OR: data.map((invite) => ({
+            email: { equals: invite.email, mode: Prisma.QueryMode.insensitive },
+          })),
+        },
+        select: { email: true },
+      })
+    : [];
+
+  const accountEmails = new Set(existingUsers.map((u) => u.email.toLowerCase()));
+
+  const dataWithAccount = data.map((invite) => ({
+    ...invite,
+    hasAccount: accountEmails.has(invite.email.toLowerCase()),
+  }));
+
   return {
-    data,
+    data: dataWithAccount,
     count,
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultResponse<typeof data>;
+  } satisfies FindResultResponse<typeof dataWithAccount>;
 };

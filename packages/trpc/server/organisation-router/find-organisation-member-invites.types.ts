@@ -26,7 +26,10 @@ export const ZFindOrganisationMemberInvitesResponseSchema = ZFindResultResponse.
     createdAt: true,
     organisationRole: true,
     status: true,
-  }).array(),
+  })
+    // xtend-docs: whether the invited email already has an account (signed up but not yet accepted).
+    .extend({ hasAccount: z.boolean() })
+    .array(),
 });
 
 export type TFindOrganisationMemberInvitesResponse = z.infer<typeof ZFindOrganisationMemberInvitesResponseSchema>;
