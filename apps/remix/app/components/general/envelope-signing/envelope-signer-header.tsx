@@ -43,7 +43,7 @@ export const EnvelopeSignerHeader = () => {
             />
           ) : (
             <Link to="/" className="flex-shrink-0">
-              <BrandingLogo className="hidden h-6 w-auto md:block" />
+              <BrandingLogo variant="full" className="hidden h-10 w-auto md:block" />
               <BrandingLogoIcon className="h-6 w-auto md:hidden" />
             </Link>
           ))}
