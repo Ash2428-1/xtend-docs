@@ -40,6 +40,7 @@ import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { assertEnvelopeContentSaveWithinLimits } from '../../utils/envelope-content';
 import { buildTeamWhereQuery } from '../../utils/teams';
+import { env } from '../../utils/env';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisation-rates-and-limits';
 import { assignOmittedRecipientSigningOrders } from '../recipient/assign-omitted-recipient-signing-orders';
@@ -212,6 +213,8 @@ export const createEnvelope = async ({
       });
     }
   }
+
+  const resolvedFolderId = folderId ?? (await findDefaultDocumentFolderId({ teamId, type }));
 
   const settings = await getTeamSettings({
     userId,
@@ -432,7 +435,7 @@ export const createEnvelope = async ({
         teamId,
         authOptions,
         visibility,
-        folderId,
+        folderId: resolvedFolderId,
         formValues,
         source: type === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,
         documentMetaId: documentMeta.id,
@@ -774,4 +777,30 @@ export const createEnvelope = async ({
   }
 
   return createdEnvelope;
+};
+
+/**
+ * xtend-docs: documents created without a folder go into the team's top-level folder named by
+ * NEXT_PRIVATE_DEFAULT_DOCUMENT_FOLDER_NAME, when the team has one. Templates and teams without
+ * that folder keep the upstream behaviour (no folder).
+ */
+const findDefaultDocumentFolderId = async ({ teamId, type }: { teamId: number; type: EnvelopeType }) => {
+  const defaultFolderName = env('NEXT_PRIVATE_DEFAULT_DOCUMENT_FOLDER_NAME')?.trim();
+
+  if (!defaultFolderName || type !== EnvelopeType.DOCUMENT) {
+    return undefined;
+  }
+
+  const folder = await prisma.folder.findFirst({
+    where: {
+      teamId,
+      type: FolderType.DOCUMENT,
+      parentId: null,
+      name: { equals: defaultFolderName, mode: 'insensitive' },
+    },
+    orderBy: { createdAt: 'asc' },
+    select: { id: true },
+  });
+
+  return folder?.id;
 };
