@@ -14,8 +14,10 @@ chmod +x apps/remix/.bin/*.sh
 
 npx turbo run build --filter=@documenso/remix --force
 
-# PDF sealing loads fonts from <cwd>/public/fonts. On Vercel the function's cwd is the
-# repo root (/var/task), not apps/remix, so mirror the fonts there (bundled via vercel.json).
+# PDF sealing reads <cwd>/public/fonts and <cwd>/public/static/logo.png. On Vercel the
+# function's cwd is the repo root (/var/task), not apps/remix, so mirror both there
+# (bundled via vercel.json includeFiles).
 mkdir -p public
-rm -rf public/fonts
+rm -rf public/fonts public/static
 cp -r apps/remix/public/fonts public/fonts
+cp -r apps/remix/public/static public/static
