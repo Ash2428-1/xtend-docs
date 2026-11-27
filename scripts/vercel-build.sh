@@ -12,4 +12,4 @@ fi
 # Uploads from Windows (vercel CLI) lose the executable bit.
 chmod +x apps/remix/.bin/*.sh
 
-npx turbo run build --filter=@documenso/remix
+npx turbo run build --filter=@documenso/remix --force
