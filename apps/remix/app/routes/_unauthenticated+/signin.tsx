@@ -11,7 +11,6 @@ import {
 } from '@documenso/lib/constants/auth';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader2Icon } from 'lucide-react';
@@ -20,12 +19,12 @@ import { Link, redirect, useSearchParams } from 'react-router';
 
 import { SignInForm } from '~/components/forms/signin';
 import { SIGNUP_ERROR_MESSAGES } from '~/components/forms/signup';
-import { appMetaTags } from '~/utils/meta';
+import { BrandingLogo } from '~/components/general/branding-logo';
 
 import type { Route } from './+types/signin';
 
 export function meta() {
-  return appMetaTags(msg`Sign In`);
+  return [{ title: 'Xtend Document Approval' }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -124,12 +123,10 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           </Alert>
         )}
 
-        <h1 className="font-semibold text-2xl">
-          <Trans>Sign in to your account</Trans>
-        </h1>
-
+        <BrandingLogo className="mb-4 h-9 w-auto" />
+        <h1 className="font-semibold text-2xl">Xtend Document Approval</h1>
         <p className="mt-2 text-muted-foreground text-sm">
-          <Trans>Welcome back, we are lucky to have you.</Trans>
+          <Trans>Sign in to your account</Trans>
         </p>
         <hr className="-mx-6 my-4" />
 
