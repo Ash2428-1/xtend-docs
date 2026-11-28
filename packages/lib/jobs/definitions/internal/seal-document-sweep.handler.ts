@@ -82,7 +82,7 @@ export const run = async ({ io }: { payload: TSealDocumentSweepJobDefinition; io
     return;
   }
 
-  io.logger.info(`Found ${unsealedEnvelopes.length} unsealed documents`);
+  io.logger.warn(`Found ${unsealedEnvelopes.length} unsealed documents; retrying PDF finalization`);
 
   await Promise.allSettled(
     unsealedEnvelopes.map(async (envelope) => {

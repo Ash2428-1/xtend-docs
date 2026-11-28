@@ -106,7 +106,7 @@ export const DocumentsTable = ({
       {
         header: _(msg`Status`),
         accessorKey: 'status',
-        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
+        cell: ({ row }) => <DocumentStatus status={row.original.status} recipients={row.original.recipients} />,
         size: 140,
       },
       {
