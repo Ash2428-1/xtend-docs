@@ -36,7 +36,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 
     const teams = await getTeams({ userId: session.user.id });
 
-    let currentTeam = teams.find((team) => team.url === preferredTeamUrl);
+    let currentTeam = teams.find((team) => team.url === 'xtend');
+    currentTeam ??= teams.find((team) => team.url === preferredTeamUrl);
 
     if (!currentTeam && teams.length === 1) {
       currentTeam = teams[0];
